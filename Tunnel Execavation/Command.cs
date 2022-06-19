@@ -70,21 +70,26 @@ namespace Tunnel_Execavation
 
             // get the path of family template folder
             string famTemplatePath = app.FamilyTemplatePath;
-            string[] paths = { famTemplatePath, @"English\Metric Generic Model.rft" };
-            string familyTemplateFolderPath = Path.Combine(paths);
+            string familyTemplateFullName = Path.Combine(famTemplatePath, @"English\Metric Generic Model.rft");
+
+            //declare new family Name and Path
+            string nfamilyName = @"NewTunnel.rfa";
+            string nfamilyPath = Path.Combine(@"c:\temp", nfamilyName);
+
+
 
             // create generic family
             try
             {
-                familyDocument = app.NewFamilyDocument(familyTemplateFolderPath);
-                familyDocument.SaveAs(@"c:\temp\TestCreationInFamily.rfa");
+                familyDocument = app.NewFamilyDocument(familyTemplateFullName);
+                familyDocument.SaveAs(nfamilyPath);
 
                 TaskDialog td = new TaskDialog("Sucess")
                 {
                     Title = "Success 002",
                     AllowCancellation = true,
-                    MainInstruction = "success",
-                    MainContent = "create family - TestCreationInFamily with generic family template"
+                    MainInstruction = "Success",
+                    MainContent = "Created family \n {nfamilyPath} with generic family template"
                 };
 
                 td.CommonButtons = TaskDialogCommonButtons.Ok;
@@ -99,7 +104,7 @@ namespace Tunnel_Execavation
                     Title = "Error 001",
                     AllowCancellation = true,
                     MainInstruction = "Cannot Create family",
-                    MainContent = $"{e.Message}: \n {familyTemplateFolderPath}"
+                    MainContent = $"{e.Message} \n {nfamilyPath}"
                 };
 
                 td.CommonButtons = TaskDialogCommonButtons.Ok;
