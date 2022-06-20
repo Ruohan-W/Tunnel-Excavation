@@ -33,6 +33,7 @@ namespace Tunnel_Execavation
             {
                 CreateFamily(app);
             }
+
             // tell Revit it is succeeded
             return Result.Succeeded;
         }
@@ -125,22 +126,50 @@ namespace Tunnel_Execavation
                 );
         }
 
-        public static void Loadfamily(Element loadedFamily, string FamilyPath, string FamilyName)
+        public static void Loadfamily(Document doc, UIDocument uidoc, Family loadedFamily, string familyPath, string FamilyName)
         {
             if (null == loadedFamily)
             {
-                if (!File.Exists(FamilyPath))
+                if (!File.Exists(familyPath))
                 {
                     TaskDialog td = new TaskDialog("Error")
                     {
                         Title = "Error 002",
                         AllowCancellation = true,
                         MainInstruction = "Cannot Load Family",
-                        MainContent = $"Please ensure that the family file {FamilyName} exists in {FamilyPath}"
+                        MainContent = $"Please ensure that the family file {FamilyName} exists in {familyPath}"
                     };
 
                     td.CommonButtons = TaskDialogCommonButtons.Ok;
                     td.Show();
+                }
+                else 
+                {
+                    // start transaction - load family from the tempoary folder
+                    using (Transaction tx = new Transaction(doc))
+                    {
+                        tx.Start("Load Family");
+                        doc.LoadFamily(familyPath, out loadedFamily);
+                        tx.Commit();
+                    }
+
+                    // place the family instance into the Revit file
+                    FamilySymbol symbol = null;
+                    
+                    ISet<ElementId> familySymbolIds = loadedFamily.GetFamilySymbolIds();
+
+                    /*
+                    foreach (ElementId sId in familySymbolIds)
+                    {
+                        symbol = loadedFamily.Document.GetElement(sId) as FamilySymbol;
+                        break;
+                    }
+                    */
+
+                    ElementId firstId = familySymbolIds.FirstOrDefault();
+                    symbol = loadedFamily.Document.GetElement(firstId) as FamilySymbol;
+
+                    uidoc.PromptForFamilyInstancePlacement(symbol);
                 }
             }
         }
