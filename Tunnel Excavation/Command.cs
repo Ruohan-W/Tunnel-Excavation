@@ -158,14 +158,6 @@ namespace Tunnel_Excavation
                     
                     ISet<ElementId> familySymbolIds = loadedFamily.GetFamilySymbolIds();
 
-                    /*
-                    foreach (ElementId sId in familySymbolIds)
-                    {
-                        symbol = loadedFamily.Document.GetElement(sId) as FamilySymbol;
-                        break;
-                    }
-                    */
-
                     ElementId firstId = familySymbolIds.FirstOrDefault();
                     symbol = loadedFamily.Document.GetElement(firstId) as FamilySymbol;
 
