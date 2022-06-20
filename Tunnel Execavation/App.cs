@@ -16,7 +16,7 @@ using System.Windows.Media.Imaging;
 
 #endregion
 
-namespace Tunnel_Execavation
+namespace Tunnel_Excavation
 {
     internal class App : IExternalApplication
     {
@@ -58,7 +58,7 @@ namespace Tunnel_Execavation
                 "Tunnel",
                 "Create Tunnel",
                 Assembly.GetExecutingAssembly().Location,
-                "Tunnel_Execavation.Command"
+                "Tunnel_Excavation.Command"
                 )
             {
                 ToolTip = "short description that is shown when you hover over the button",
