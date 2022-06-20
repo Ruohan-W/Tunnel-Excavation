@@ -12,7 +12,7 @@ using System.Linq;
 
 #endregion
 
-namespace Tunnel_Execavation
+namespace Tunnel_Excavation
 {
     [Transaction(TransactionMode.Manual)]
     public class Command : IExternalCommand
