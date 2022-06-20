@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Tunnel Execavation")]
-[assembly: AssemblyDescription("Revit Add-In Description for Tunnel Execavation")]
+[assembly: AssemblyTitle("Tunnel Excavation")]
+[assembly: AssemblyDescription("Revit Add-In Description for Tunnel Excavation")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Autodesk Inc.")]
-[assembly: AssemblyProduct("Tunnel Execavation Revit C# .NET Add-In")]
+[assembly: AssemblyProduct("Tunnel Excavation Revit C# .NET Add-In")]
 [assembly: AssemblyCopyright("Copyright (C) 2020 by Jeremy Tammik, Autodesk Inc.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

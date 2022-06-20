@@ -31,7 +31,12 @@ namespace Tunnel_Excavation
 
             if (!isAFamilyDoc)
             {
-                CreateFamily(app);
+                Family loadedFamily = (Family)FindElementByName(doc, typeof(Family), "NewTunnel");
+
+                if (loadedFamily == null)
+                {
+                    CreateFamily(app);
+                }
             }
 
             // tell Revit it is succeeded
@@ -90,7 +95,7 @@ namespace Tunnel_Excavation
                     Title = "Success 002",
                     AllowCancellation = true,
                     MainInstruction = "Success",
-                    MainContent = "Created family \n {nfamilyPath} with generic family template"
+                    MainContent = $"Created family \n {nfamilyPath} with generic family template"
                 };
 
                 td.CommonButtons = TaskDialogCommonButtons.Ok;
@@ -152,14 +157,11 @@ namespace Tunnel_Excavation
                         doc.LoadFamily(familyPath, out loadedFamily);
                         tx.Commit();
                     }
-
-                    // place the family instance into the Revit file
-                    FamilySymbol symbol = null;
                     
                     ISet<ElementId> familySymbolIds = loadedFamily.GetFamilySymbolIds();
 
                     ElementId firstId = familySymbolIds.FirstOrDefault();
-                    symbol = loadedFamily.Document.GetElement(firstId) as FamilySymbol;
+                    FamilySymbol symbol = loadedFamily.Document.GetElement(firstId) as FamilySymbol;
 
                     uidoc.PromptForFamilyInstancePlacement(symbol);
                 }

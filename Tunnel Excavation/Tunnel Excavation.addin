@@ -1,18 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <RevitAddIns>
   <AddIn Type="Command">
-    <Text>Command Tunnel Execavation</Text>
-    <Description>Some description for Tunnel Execavation</Description>
-    <Assembly>Tunnel Execavation.dll</Assembly>
-    <FullClassName>Tunnel_Execavation.Command</FullClassName>
+    <Text>Command Tunnel Excavation</Text>
+    <Description>Some description for Tunnel Excavation</Description>
+    <Assembly>Tunnel Excavation.dll</Assembly>
+    <FullClassName>Tunnel_Excavation.Command</FullClassName>
     <ClientId>baefc232-aee5-4918-a69b-cf3733960d94</ClientId>
     <VendorId>com.typepad.thebuildingcoder</VendorId>
     <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>
   </AddIn>
   <AddIn Type="Application">
-    <Name>Application Tunnel Execavation</Name>
-    <Assembly>Tunnel Execavation.dll</Assembly>
-    <FullClassName>Tunnel_Execavation.App</FullClassName>
+    <Name>Application Tunnel Excavation</Name>
+    <Assembly>Tunnel Excavation.dll</Assembly>
+    <FullClassName>Tunnel_Excavation.App</FullClassName>
     <ClientId>dd348ce8-c80b-4639-8e66-6419cac23796</ClientId>
     <VendorId>com.typepad.thebuildingcoder</VendorId>
     <VendorDescription>The Building Coder, http://thebuildingcoder.typepad.com</VendorDescription>

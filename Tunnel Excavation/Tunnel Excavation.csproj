@@ -13,8 +13,8 @@
     <ProjectGuid>{67800459-F24D-458C-BE0A-B87E0033555C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Tunnel_Execavation</RootNamespace>
-    <AssemblyName>Tunnel Execavation</AssemblyName>
+    <RootNamespace>Tunnel_Excavation</RootNamespace>
+    <AssemblyName>Tunnel Excavation</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
