@@ -2,6 +2,7 @@
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
+using Autodesk.Revit.DB.Events;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Selection;
 using System;
@@ -27,23 +28,51 @@ namespace Tunnel_Excavation
             Application app = uiapp.Application;
             Document doc = uidoc.Document;
 
+            // get the path of family template folder
+            string famTemplatePath = app.FamilyTemplatePath;
+            string familyTemplateFullName = Path.Combine(famTemplatePath, @"English\Metric Generic Model.rft");
+
+            //declare new family Name and Path
+            string nfamilyName = @"NewTunnel.rfa";
+            string nfamilyPath = Path.Combine(@"c:\temp", nfamilyName);
+
+            // check whether this is family file (.rfa) or a project file (.rvt)
             bool isAFamilyDoc = CheckFamily(doc);
 
+            // if it is a project file, check whether the target family already loaded
             if (!isAFamilyDoc)
             {
                 Family loadedFamily = (Family)FindElementByName(doc, typeof(Family), "NewTunnel");
 
-                if (loadedFamily == null)
+                if (null != loadedFamily)
                 {
-                    CreateFamily(app);
+                    TaskDialog td = new TaskDialog("Erorr")
+                    {
+                        Title = "Error 003",
+                        AllowCancellation = true,
+                        MainInstruction = "Cannot load family",
+                        MainContent = "Target family NewTunnel has already been loaded to the project"
+                    };
+
+                    td.CommonButtons = TaskDialogCommonButtons.Cancel;
+                    td.Show();
+                }
+                else
+                {
+                    // if the target has not been loaded yet. create the family first.
+                    CreateFamily(app, familyTemplateFullName, nfamilyPath);
+
+                    // load the family we just created
+                    Family nLoadedFamily = Loadfamily(doc, loadedFamily, nfamilyPath, nfamilyName);
+
+                    // place family instance
+                    PlaceFamilyInstance(nLoadedFamily, uidoc, app);
                 }
             }
-
             // tell Revit it is succeeded
             return Result.Succeeded;
         }
 
-        // Create new swept blend family
         // check whether this is a family file
         private bool CheckFamily(Document doc)
         {
@@ -59,7 +88,7 @@ namespace Tunnel_Excavation
                     Title = "Success 001",
                     AllowCancellation = true,
                     MainInstruction = "success",
-                    MainContent = "we are in a family file."
+                    MainContent = "We are in a family file."
                 };
 
                 td.CommonButtons = TaskDialogCommonButtons.Ok;
@@ -69,20 +98,10 @@ namespace Tunnel_Excavation
             }
         }
 
-        // create and a new family 
-        public static Document CreateFamily(Application app)
+        // create and a new family - swept blend family for tunnel
+        public static Document CreateFamily(Application app, string familyTemplateFullName, string nfamilyPath)
         {
             Document familyDocument = null;
-
-            // get the path of family template folder
-            string famTemplatePath = app.FamilyTemplatePath;
-            string familyTemplateFullName = Path.Combine(famTemplatePath, @"English\Metric Generic Model.rft");
-
-            //declare new family Name and Path
-            string nfamilyName = @"NewTunnel.rfa";
-            string nfamilyPath = Path.Combine(@"c:\temp", nfamilyName);
-
-
 
             // create generic family
             try
@@ -120,18 +139,31 @@ namespace Tunnel_Excavation
             }
         }
 
-        // load family to the Reivt file
         // check whether the family already loaded
         public static Element FindElementByName(Document doc, Type targetType, string targetName)
         {
+            // get all elements of the target type
+            FilteredElementCollector targetElementCollector
+                = new FilteredElementCollector(doc)
+                .OfClass(targetType);
+
+            // get the first element with the target name
+            Element foundElement = targetElementCollector.FirstOrDefault(e => e.Name.Equals(targetName)) as Element;
+
+            return foundElement;
+
+            /* shorthand of the code above
+             
             return new FilteredElementCollector(doc)
                 .OfClass(targetType)
                 .FirstOrDefault<Element>(
                  e => e.Name.Equals(targetName)
                 );
+            */
         }
 
-        public static void Loadfamily(Document doc, UIDocument uidoc, Family loadedFamily, string familyPath, string FamilyName)
+        // load family to the Reivt file
+        public static Family Loadfamily(Document doc, Family loadedFamily, string familyPath, string FamilyName)
         {
             if (null == loadedFamily)
             {
@@ -157,16 +189,37 @@ namespace Tunnel_Excavation
                         doc.LoadFamily(familyPath, out loadedFamily);
                         tx.Commit();
                     }
-                    
-                    ISet<ElementId> familySymbolIds = loadedFamily.GetFamilySymbolIds();
-
-                    ElementId firstId = familySymbolIds.FirstOrDefault();
-                    FamilySymbol symbol = loadedFamily.Document.GetElement(firstId) as FamilySymbol;
-
-                    uidoc.PromptForFamilyInstancePlacement(symbol);
                 }
             }
+            return loadedFamily;
         }
+
+        // place the family symbol
+        public static void PlaceFamilyInstance(Family loadedFamily, UIDocument uidoc, Application app)
+        {
+            List<ElementId> _added_element_ids= new List<ElementId>();
+
+            void OnDocumentChanged(object sender, DocumentChangedEventArgs e)
+            {
+                _added_element_ids.AddRange(e.GetAddedElementIds());
+            }
+
+            app.DocumentChanged += new EventHandler<DocumentChangedEventArgs>(OnDocumentChanged);
+            _added_element_ids.Clear();
+
+            ISet<ElementId> familySymbolIds = loadedFamily.GetFamilySymbolIds();
+
+            ElementId firstId = familySymbolIds.FirstOrDefault() as ElementId;
+            FamilySymbol symbol = loadedFamily.Document.GetElement(firstId) as FamilySymbol;
+
+            uidoc.PromptForFamilyInstancePlacement(symbol);
+
+            app.DocumentChanged -= new EventHandler<DocumentChangedEventArgs>(OnDocumentChanged);
+
+            int n = _added_element_ids.Count();
+        }
+
+
 
         // edit family
         // create 1st sweepProfile of the tunnel
