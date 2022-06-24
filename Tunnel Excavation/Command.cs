@@ -82,7 +82,6 @@ namespace Tunnel_Excavation
         // check whether this is a family file
         private bool CheckFamily(Document doc)
         {
-
             if (!doc.IsFamilyDocument)
             {
                 return false;
@@ -113,19 +112,26 @@ namespace Tunnel_Excavation
             try
             {
                 familyDocument = app.NewFamilyDocument(familyTemplateFullName);
-                familyDocument.SaveAs(nfamilyPath);
-
-                TaskDialog td = new TaskDialog("Sucess")
+                if (null != familyDocument)
                 {
-                    Title = "Success 002",
-                    AllowCancellation = true,
-                    MainInstruction = "Success",
-                    MainContent = $"Created family \n {nfamilyPath} with generic family template"
-                };
+                    familyDocument.SaveAs(nfamilyPath);
 
-                td.CommonButtons = TaskDialogCommonButtons.Ok;
-                td.Show();
+                    // free the the family document just created
+                    bool saveChanges = false;
+                    familyDocument.Close(saveChanges);
 
+                    TaskDialog td = new TaskDialog("Sucess")
+                    {
+                        Title = "Success 002",
+                        AllowCancellation = true,
+                        MainInstruction = "Success",
+                        MainContent = $"Created family \n {nfamilyPath} with generic family template"
+                    };
+
+                    td.CommonButtons = TaskDialogCommonButtons.Ok;
+                    td.Show();
+
+                }
                 return familyDocument;
             }
             catch (Exception e)
