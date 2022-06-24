@@ -158,8 +158,7 @@ namespace Tunnel_Excavation
 
             return foundElement;
 
-            /* shorthand of the code above
-             
+            /* shorthand of the code above    
             return new FilteredElementCollector(doc)
                 .OfClass(targetType)
                 .FirstOrDefault<Element>(
@@ -202,40 +201,72 @@ namespace Tunnel_Excavation
 
         // place the family symbol
         private static void PlaceFamilyInstance(Family loadedFamily, UIDocument uidoc, Application app, Document doc)
-        {
+        {           
             List<ElementId> _added_element_ids= new List<ElementId>();
 
-            void OnDocumentChanged(object sender, DocumentChangedEventArgs e)
-            {      
-                _added_element_ids.AddRange(e.GetAddedElementIds());
-            }
+            bool _single_instance = true;
+            IWin32Window _revit_window = new JtWindowHandle(ComponentManager.ApplicationWindow);
 
-            // register to document changed event to collect newly added family instance
-            app.DocumentChanged += new EventHandler<DocumentChangedEventArgs>(OnDocumentChanged);
-            _added_element_ids.Clear();
-
-            // place family instance
             FamilySymbol symbol = null;
             foreach (ElementId id in loadedFamily.GetFamilySymbolIds())
             {
                 symbol = doc.GetElement(id) as FamilySymbol;
                 break;
             }
-            uidoc.PromptForFamilyInstancePlacement(symbol);
+
+            void OnDocumentChanged(object sender, DocumentChangedEventArgs e)
+            {
+                ICollection<ElementId> idsAdded = e.GetAddedElementIds();
+                int idsAddedCountNum = idsAdded.Count;
+
+                Debug.Print("{0} id {1} add.",
+                    idsAddedCountNum,
+                    Util.PluralSuffix(idsAddedCountNum)
+                    );
+
+                _added_element_ids.AddRange(idsAdded);
+
+                if (_single_instance && idsAddedCountNum > 0)
+                {
+                    Press.PostMessage(_revit_window.Handle,
+                        (uint)Press.KEYBOARD_MSG.WM_KEYDOWN,
+                        (uint)Keys.Escape, 0);
+
+                    Press.PostMessage(_revit_window.Handle,
+                        (uint)Press.KEYBOARD_MSG.WM_KEYDOWN,
+                        (uint)Keys.Escape, 0);
+                }
+            }
+
+            _added_element_ids.Clear();
+            // register to document changed event to collect newly added family instance
+            app.DocumentChanged += new EventHandler<DocumentChangedEventArgs>(OnDocumentChanged);
+
+            // place family instance
+            try
+            {
+                uidoc.PromptForFamilyInstancePlacement(symbol);
+            }
+            catch (Autodesk.Revit.Exceptions.OperationCanceledException ex)
+            {
+                Debug.Print(ex.Message);
+            }
 
             // unregister to document changed event to retrive the id of newly added symbol
             app.DocumentChanged -= new EventHandler<DocumentChangedEventArgs>(OnDocumentChanged);
 
             // tell the user the operation is successed 
-            int n = _added_element_ids.Count();
+            int addedElementIdsCountNum = _added_element_ids.Count();
+
             string msg = string.Format
                 (
                 "Placed {0} {1} family instance{2}{3}",
-                n, 
+                addedElementIdsCountNum, 
                 loadedFamily.Name,
-                Util.PluralSuffix(n),
-                Util.DotOrColon(n)
+                Util.PluralSuffix(addedElementIdsCountNum),
+                Util.DotOrColon(addedElementIdsCountNum)
                 );
+
             string ids = string.Join
                 (
                     ", ",

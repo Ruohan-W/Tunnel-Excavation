@@ -1,3 +1,4 @@
+#region Namespaces
 using Autodesk.Revit.ApplicationServices;
 using Autodesk.Revit.Attributes;
 using Autodesk.Revit.DB;
@@ -12,33 +13,34 @@ using System.Reflection;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+#endregion
 
 namespace Tunnel_Excavation
 {
     class Util
-    { 
-        internal static string PluralSuffix(int n)
+    {
+        public static string PluralSuffix(int n)
         {
-            string str = null;
-
-            if (n > 1)
-            {
-                str = "s";
-            }
-
-            return str;
+            return 1 == n ? "" : "s";
+        }
+        public static string PluralSuffixY(int n)
+        {
+            return 1 == n ? "y" : "ies";
         }
 
         internal static string DotOrColon(int n)
         {
-            if (n > 1)
-            {
-                return ".";
-            }
-            else 
-            {
-                return ":";
-            }
+            return n < 0 ? ":" : ".";
+        }
+
+        internal static string RealString(double a)
+        {
+            return a.ToString();
+        }
+
+        internal static string AngleString(double angle)
+        {
+            return RealString(angle * 180 / Math.PI) + "degree";
         }
     }
 }
