@@ -11,6 +11,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
+using ComponentManager = Autodesk.Windows.ComponentManager;
+using IWin32Window = System.Windows.Forms.IWin32Window;
+using Keys = System.Windows.Forms.Keys;
 #endregion
 
 namespace Tunnel_Excavation
@@ -33,8 +36,9 @@ namespace Tunnel_Excavation
             string familyTemplateFullName = Path.Combine(famTemplatePath, @"English\Metric Generic Model.rft");
 
             //declare new family Name and Path
-            string nfamilyName = @"NewTunnel.rfa";
-            string nfamilyPath = Path.Combine(@"c:\temp", nfamilyName);
+            string nfamilyName = "NewTunnel";
+            string nfamilyFormat = ".rfa";
+            string nfamilyPath = Path.Combine(@"c:\temp", nfamilyName + nfamilyFormat);
 
             // check whether this is family file (.rfa) or a project file (.rvt)
             bool isAFamilyDoc = CheckFamily(doc);
@@ -42,7 +46,7 @@ namespace Tunnel_Excavation
             // if it is a project file, check whether the target family already loaded
             if (!isAFamilyDoc)
             {
-                Family loadedFamily = (Family)FindElementByName(doc, typeof(Family), "NewTunnel");
+                Family loadedFamily = (Family)FindElementByName(doc, typeof(Family), nfamilyName);
 
                 if (null != loadedFamily)
                 {
@@ -60,13 +64,15 @@ namespace Tunnel_Excavation
                 else
                 {
                     // if the target has not been loaded yet. create the family first.
-                    CreateFamily(app, familyTemplateFullName, nfamilyPath);
+                    Document nFamilyDoc = CreateFamily(app, familyTemplateFullName, nfamilyPath);
 
                     // load the family we just created
-                    Family nLoadedFamily = Loadfamily(doc, loadedFamily, nfamilyPath, nfamilyName);
-
-                    // place family instance
-                    PlaceFamilyInstance(nLoadedFamily, uidoc, app);
+                    if (null != nFamilyDoc)
+                    {
+                        Family nLoadedFamily = Loadfamily(doc, loadedFamily, nfamilyPath, nfamilyName);
+                        // place family instance
+                        PlaceFamilyInstance(nLoadedFamily, uidoc, app, doc);
+                    }
                 }
             }
             // tell Revit it is succeeded
@@ -99,7 +105,7 @@ namespace Tunnel_Excavation
         }
 
         // create and a new family - swept blend family for tunnel
-        public static Document CreateFamily(Application app, string familyTemplateFullName, string nfamilyPath)
+        private static Document CreateFamily(Application app, string familyTemplateFullName, string nfamilyPath)
         {
             Document familyDocument = null;
 
@@ -140,7 +146,7 @@ namespace Tunnel_Excavation
         }
 
         // check whether the family already loaded
-        public static Element FindElementByName(Document doc, Type targetType, string targetName)
+        private static Element FindElementByName(Document doc, Type targetType, string targetName)
         {
             // get all elements of the target type
             FilteredElementCollector targetElementCollector
@@ -163,7 +169,7 @@ namespace Tunnel_Excavation
         }
 
         // load family to the Reivt file
-        public static Family Loadfamily(Document doc, Family loadedFamily, string familyPath, string FamilyName)
+        private static Family Loadfamily(Document doc, Family loadedFamily, string familyPath, string FamilyName)
         {
             if (null == loadedFamily)
             {
@@ -195,28 +201,57 @@ namespace Tunnel_Excavation
         }
 
         // place the family symbol
-        public static void PlaceFamilyInstance(Family loadedFamily, UIDocument uidoc, Application app)
+        private static void PlaceFamilyInstance(Family loadedFamily, UIDocument uidoc, Application app, Document doc)
         {
             List<ElementId> _added_element_ids= new List<ElementId>();
 
             void OnDocumentChanged(object sender, DocumentChangedEventArgs e)
-            {
+            {      
                 _added_element_ids.AddRange(e.GetAddedElementIds());
             }
 
+            // register to document changed event to collect newly added family instance
             app.DocumentChanged += new EventHandler<DocumentChangedEventArgs>(OnDocumentChanged);
             _added_element_ids.Clear();
 
-            ISet<ElementId> familySymbolIds = loadedFamily.GetFamilySymbolIds();
-
-            ElementId firstId = familySymbolIds.FirstOrDefault() as ElementId;
-            FamilySymbol symbol = loadedFamily.Document.GetElement(firstId) as FamilySymbol;
-
+            // place family instance
+            FamilySymbol symbol = null;
+            foreach (ElementId id in loadedFamily.GetFamilySymbolIds())
+            {
+                symbol = doc.GetElement(id) as FamilySymbol;
+                break;
+            }
             uidoc.PromptForFamilyInstancePlacement(symbol);
 
+            // unregister to document changed event to retrive the id of newly added symbol
             app.DocumentChanged -= new EventHandler<DocumentChangedEventArgs>(OnDocumentChanged);
 
+            // tell the user the operation is successed 
             int n = _added_element_ids.Count();
+            string msg = string.Format
+                (
+                "Placed {0} {1} family instance{2}{3}",
+                n, 
+                loadedFamily.Name,
+                Util.PluralSuffix(n),
+                Util.DotOrColon(n)
+                );
+            string ids = string.Join
+                (
+                    ", ",
+                    _added_element_ids.Select<ElementId, string>( id => id.IntegerValue.ToString())
+                );
+
+            TaskDialog td = new TaskDialog("Success")
+            {
+                Title = "Success 003",
+                AllowCancellation = true,
+                MainContent = "Successfully placed family instance",
+                MainInstruction = msg + ids,
+            };
+
+            td.CommonButtons = TaskDialogCommonButtons.Ok;
+            td.Show();
         }
 
 

@@ -41,6 +41,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Accessibility" />
+    <Reference Include="AdWindows">
+      <HintPath>..\..\..\..\..\..\Program Files\Autodesk\Revit 2021\AdWindows.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="PresentationCore" />
     <Reference Include="RevitAPI">
