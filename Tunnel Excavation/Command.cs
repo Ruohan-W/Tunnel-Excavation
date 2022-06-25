@@ -130,7 +130,6 @@ namespace Tunnel_Excavation
 
                     td.CommonButtons = TaskDialogCommonButtons.Ok;
                     td.Show();
-
                 }
                 return familyDocument;
             }
@@ -176,6 +175,7 @@ namespace Tunnel_Excavation
         // load family to the Reivt file
         private static Family Loadfamily(Document doc, Family loadedFamily, string familyPath, string FamilyName)
         {
+
             if (null == loadedFamily)
             {
                 if (!File.Exists(familyPath))
@@ -303,5 +303,4 @@ namespace Tunnel_Excavation
         // Delete family file from h
 
     }
-
 }
