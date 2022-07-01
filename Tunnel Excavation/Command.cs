@@ -50,16 +50,31 @@ namespace Tunnel_Excavation
 
                 if (null != loadedFamily)
                 {
-                    TaskDialog td = new TaskDialog("Erorr")
+                    TaskDialog td = new TaskDialog("Override")
                     {
-                        Title = "Error 003",
+                        Title = "Proceed to Override",
                         AllowCancellation = true,
-                        MainInstruction = "Cannot load family",
-                        MainContent = "Target family NewTunnel has already been loaded to the project"
+                        MainInstruction = "Do you Want to override the existing family?",
+                        MainContent = $"Target family {nfamilyName} already exists in the project. Do you want to override it with the new family?",
+                        MainIcon = TaskDialogIcon.TaskDialogIconWarning,
                     };
+                    td.CommonButtons = TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.Cancel;
+                    td.DefaultButton = TaskDialogResult.Yes;
 
-                    td.CommonButtons = TaskDialogCommonButtons.Cancel;
-                    td.Show();
+                    TaskDialogResult rslt = td.Show();
+
+                    if (TaskDialogResult.Yes == rslt)
+                    {
+                        Document nFamilyDoc = CreateFamily(app, familyTemplateFullName, nfamilyPath);
+
+                        // load the family we just created
+                        if (null != nFamilyDoc)
+                        {
+                            Family nLoadedFamily = Loadfamily(doc, loadedFamily, nfamilyPath, nfamilyName);
+                            // place family instance
+                            PlaceFamilyInstance(nLoadedFamily, uidoc, app, doc);
+                        }
+                    }
                 }
                 else
                 {
@@ -114,7 +129,12 @@ namespace Tunnel_Excavation
                 familyDocument = app.NewFamilyDocument(familyTemplateFullName);
                 if (null != familyDocument)
                 {
-                    familyDocument.SaveAs(nfamilyPath);
+                    SaveAsOptions opt = new SaveAsOptions()
+                    { 
+                        OverwriteExistingFile = true,
+                    };
+
+                    familyDocument.SaveAs(nfamilyPath, opt);
 
                     // free the the family document just created
                     bool saveChanges = false;
@@ -193,11 +213,14 @@ namespace Tunnel_Excavation
                 }
                 else 
                 {
+                    // call the ILoadfamilyOption interface
+                    IFamilyLoadOptions loadOpt = new FamilyLoadOptions();
+
                     // start transaction - load family from the tempoary folder
                     using (Transaction tx = new Transaction(doc))
                     {
                         tx.Start("Load Family");
-                        doc.LoadFamily(familyPath, out loadedFamily);
+                        doc.LoadFamily(familyPath, loadOpt, out loadedFamily);
                         tx.Commit();
                     }
                 }
@@ -283,15 +306,35 @@ namespace Tunnel_Excavation
             {
                 Title = "Success 003",
                 AllowCancellation = true,
-                MainContent = "Successfully placed family instance",
-                MainInstruction = msg + ids,
+                MainInstruction = "Successfully placed family instance",
+                MainContent = msg + ids,
             };
 
             td.CommonButtons = TaskDialogCommonButtons.Ok;
             td.Show();
         }
 
+        class FamilyLoadOptions : IFamilyLoadOptions
+        {
+            public bool OnFamilyFound(
+              bool familyInUse,
+              out bool overwriteParameterValues)
+            {
+                overwriteParameterValues = true;
+                return true;
+            }
 
+            public bool OnSharedFamilyFound(
+              Family sharedFamily,
+              bool familyInUse,
+              out FamilySource source,
+              out bool overwriteParameterValues)
+            {
+                source = FamilySource.Family;
+                overwriteParameterValues = true;
+                return true;
+            }
+        }
 
         // edit family
         // create 1st sweepProfile of the tunnel
@@ -299,7 +342,7 @@ namespace Tunnel_Excavation
         // create the reference path
         // rotate the sweepProfile to be prependiculate to the reference path
 
-        
+
         // Delete family file from h
 
     }
