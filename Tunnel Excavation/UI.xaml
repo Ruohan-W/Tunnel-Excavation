@@ -54,7 +54,7 @@
                 <!-- Tunnel Rail-->
                 <StackPanel Grid.Column="2">
                     <TextBlock x:Name="TextBlock_rail" Text="Tunnel rail" FontFamily="AECOM Sans" FontWeight="Bold" FontSize="14" />
-                    <Button x:Name="button_SelectRail" Content=" Select Tunnel Rail" FontFamily="AECOM Sans" Padding="5" VerticalAlignment="Center" HorizontalAlignment="Stretch" Click="button_SelectRail_Click"></Button>
+                    <Button x:Name="button_SelectRail" Click="SelectRail_Click" Content=" Select Tunnel Rail" FontFamily="AECOM Sans" Padding="5" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin=" 0,10" ></Button>
                 </StackPanel>
             </Grid>
             <Separator Margin="0 15"/>

@@ -45,11 +45,22 @@ namespace Tunnel_Excavation
             saveFamilyDialog.InitialDirectory = @"c:\temp\";
             saveFamilyDialog.AddExtension = true;
             saveFamilyDialog.DefaultExt = "rfa";
+            saveFamilyDialog.Filter = "Comma Separated(*.rfa)| *.* ";
 
             if (saveFamilyDialog.ShowDialog() == true)
             {
                 File.WriteAllText(saveFamilyDialog.FileName, this.input_fileDirectory.Text);
             }
+        }
+
+        private void SelectRail_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
