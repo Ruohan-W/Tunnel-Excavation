@@ -5,20 +5,23 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Tunnel_Excavation"
              mc:Ignorable="d" 
-             d:DesignHeight="950" d:DesignWidth="800"
+             d:DesignHeight="920" 
+             d:DesignWidth="800" 
+             ResizeMode="NoResize" 
              Title="Create Tunnel">
     <Border Padding="15">
         <!-- inputs for the tunnel geometry -->
         <StackPanel>
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="18*"/>
+                    <ColumnDefinition Width="16*"/>
                     <ColumnDefinition Width="1*"/>
                     <ColumnDefinition Width="6*"/>
                 </Grid.ColumnDefinitions>
                 <!-- tunnel cavern profile-->
                 <StackPanel Grid.Column="0">
-                    <TextBlock x:Name="textBlock_profile" Text="Tunnel cavern profile" FontFamily="AECOM Sans" FontWeight="Bold" FontSize="14" />
+                    <TextBlock x:Name="textBlock_profile" Text="Tunnel cavern profile" FontFamily="AECOM Sans" FontWeight="Bold" FontSize="16
+                               " />
                     <Grid Margin="10,10,0,0">
                         <Grid.RowDefinitions >
                             <RowDefinition Height="1*" />
@@ -53,15 +56,15 @@
 
                 <!-- Tunnel Rail-->
                 <StackPanel Grid.Column="2">
-                    <TextBlock x:Name="TextBlock_rail" Text="Tunnel rail" FontFamily="AECOM Sans" FontWeight="Bold" FontSize="14" />
-                    <Button x:Name="button_SelectRail" Click="SelectRail_Click" Content=" Select Tunnel Rail" FontFamily="AECOM Sans" Padding="5" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin=" 0,10" ></Button>
+                    <TextBlock x:Name="TextBlock_rail" Text="Tunnel rail" FontFamily="AECOM Sans" FontWeight="Bold" FontSize="16" />
+                    <Button x:Name="button_SelectRail" Click="SelectRail_Click" Content=" Select rail" FontFamily="AECOM Sans" Padding="5" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="0,10,10,10" ></Button>
                 </StackPanel>
             </Grid>
             <Separator Margin="0 15"/>
 
             <!-- inputs for family setting -->
             <StackPanel>
-                <TextBlock x:Name="textBlock_Family" Text="Family Settings" FontFamily="AECOM Sans" FontWeight="Bold" FontSize="14" />
+                <TextBlock x:Name="textBlock_Family" Text="Family settings" FontFamily="AECOM Sans" FontWeight="Bold" FontSize="16" />
             </StackPanel>
             <Grid Margin="10,10,0,0">
                 <Grid.RowDefinitions>
@@ -72,21 +75,21 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="6*"/>
                     <ColumnDefinition Width="6*"/>
-                    <ColumnDefinition Width="6*"/>
+                    <ColumnDefinition Width="4*"/>
                     <ColumnDefinition Width="1*"/>
                     <ColumnDefinition Width="6*"/>
                 </Grid.ColumnDefinitions>
 
                 <Label x:Name="label_familyType" Content="Family template type" FontFamily="AECOM Sans" Grid.Row="0" Grid.Column="0" Margin="0,0,0,10" Grid.RowSpan="2"/>
-                <ComboBox SelectedIndex="1" x:Name="input_familyType" Grid.Row="0" Grid.Column="1" Padding="5" Margin="0,0,0,10" Grid.RowSpan="2" >
+                <ComboBox SelectedIndex="1" x:Name="input_familyType" Grid.Row="0" Grid.Column="1" Padding="5" Margin="0,0,0,10" Grid.RowSpan="2" SelectionChanged="Input_familyType_SelectionChanged" >
                     <ComboBoxItem>Imperial Template</ComboBoxItem>
                     <ComboBoxItem>Metric Template</ComboBoxItem>
                 </ComboBox>
 
                 <Label x:Name="label_NameAndSaveFile" Content="Name and save tunnel family" FontFamily="AECOM Sans" Grid.Row="2" Grid.Column="0"/>
-                <TextBox x:Name="input_fileDirectory" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Grid.Row="2" Grid.Column="1" Padding="5"></TextBox>
+                <TextBox x:Name="input_fileDirectory" TextWrapping="Wrap" AcceptsReturn="True" ScrollViewer.VerticalScrollBarVisibility="Auto" Grid.Row="2" Grid.Column="1" Padding="5" TextChanged="Input_fileDirectory_TextChanged"></TextBox>
                 <CheckBox x:Name="checkbox_save" Content ="save tunnel family" IsChecked="True" FontFamily="AECOM Sans" Grid.Row="2" Grid.Column="2" Foreground="#FFA0A0A0" Margin="10,0,10,0" VerticalAlignment="Center" Height="15"/>
-                <Button x:Name="btn_saveFamilyFile" Click="SaveFamily_Click" Content="Save family" FontFamily="AECOM Sans" Padding="5" VerticalAlignment="Center" Grid.Row="2" Grid.Column="4" Height="28"/>
+                <Button x:Name="btn_saveFamilyFile" Click="SaveFamily_Click" Content="Save family to ..." FontFamily="AECOM Sans" Padding="5" VerticalAlignment="Center" Grid.Row="2" Grid.Column="4" Height="28" Margin="0,0,10,0"/>
             </Grid>
             <Separator Margin="0 15"/>
 
@@ -94,15 +97,15 @@
             <StackPanel>
                 <Grid Margin="0,0,0,0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="18*"/>
+                        <ColumnDefinition Width="16*"/>
                         <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="2.75*"/>
-                        <ColumnDefinition Width=".5*"/>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width=".25*"/>
                         <ColumnDefinition Width="2.75*"/>
                     </Grid.ColumnDefinitions>
 
-                    <Button x:Name="btn_createTunnel" Click="CreateTunnel_Click" Content="Create tunnel" FontFamily="AECOM Sans" Padding="5" VerticalAlignment="Center" Grid.Column="2"/>
-                    <Button x:Name="btn_cancel" Click="Cancel_Click" Content="Cancel" FontFamily="AECOM Sans" Padding="5" VerticalAlignment="Center" Grid.Column="4"/>
+                    <Button x:Name="btn_createTunnel" Click="CreateTunnel_Click" Content="Create tunnel" FontFamily="AECOM Sans" Padding="5" VerticalAlignment="Center" Grid.Column="2" Margin="0,0,10,0"/>
+                    <Button x:Name="btn_cancel" Click="Cancel_Click" Content="Cancel" FontFamily="AECOM Sans" Padding="5" VerticalAlignment="Center" Grid.Column="4" Margin="0,0,10,0"/>
                 </Grid>
             </StackPanel>
         </StackPanel>

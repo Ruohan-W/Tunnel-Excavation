@@ -14,6 +14,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Autodesk.Revit.UI;
+using Autodesk.Revit.DB;
 
 namespace Tunnel_Excavation
 {
@@ -22,9 +24,17 @@ namespace Tunnel_Excavation
     /// </summary>
     public partial class UI : Window
     {
-        public UI()
+        public UIDocument Uidoc { get; }
+        public Document Doc { get; }
+
+        public string familyTemplateName = "";
+        public string familyName = "";
+        public UI(UIDocument UiDoc)
         {
+            Uidoc = UiDoc;
+            Doc = UiDoc.Document;
             InitializeComponent();
+            Title = "Create Tunnel";
         }
 
         private void CreateTunnel_Click(object sender, RoutedEventArgs e)
@@ -32,8 +42,8 @@ namespace Tunnel_Excavation
             // get all inputs from UI WPF
             // inpputs of tunnel geometry
             float span = Convert.ToSingle(String.Format("{0:0.00}", this.input_span.Text));
-            float degree = Convert.ToSingle(String.Format("{0:0.00}", this.input_degree));
-            float ratio = Convert.ToSingle(String.Format("{0:0.00}", this.input_ratio));
+            float degree = Convert.ToSingle(String.Format("{0:0.00}", this.input_degree.Text));
+            float ratio = Convert.ToSingle(String.Format("{0:0.00}", this.input_ratio.Text));
 
             // input of the fmaily type
             string familyTemplateType =((ComboBoxItem) this.input_familyType.SelectedItem).Content.ToString();
@@ -41,7 +51,7 @@ namespace Tunnel_Excavation
 
         private void SaveFamily_Click(object sender, RoutedEventArgs e) 
         {
-            SaveFileDialog saveFamilyDialog= new SaveFileDialog();
+            SaveFileDialog saveFamilyDialog = new SaveFileDialog();
             saveFamilyDialog.InitialDirectory = @"c:\temp\";
             saveFamilyDialog.AddExtension = true;
             saveFamilyDialog.DefaultExt = "rfa";
@@ -53,6 +63,23 @@ namespace Tunnel_Excavation
             }
         }
 
+        private void Input_familyType_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            string familyType = ((ComboBoxItem)input_familyType.SelectedItem).Content.ToString();
+
+            if (familyType == "Metric Template")
+            {
+                familyTemplateName = @"English\Metric Generic Model.rft";
+            }
+            else 
+            {
+                familyTemplateName = @"English-Imperial\Generic Model.rft";
+            }
+        }
+        private void Input_fileDirectory_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            familyName = input_fileDirectory.Text;
+        }
         private void SelectRail_Click(object sender, RoutedEventArgs e)
         {
 
@@ -62,5 +89,7 @@ namespace Tunnel_Excavation
         {
 
         }
+
+
     }
 }

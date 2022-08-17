@@ -31,14 +31,11 @@ namespace Tunnel_Excavation
             Application app = uiapp.Application;
             Document doc = uidoc.Document;
 
-            // get the path of family template folder
-            string famTemplatePath = app.FamilyTemplatePath;
-            string familyTemplateFullName = Path.Combine(famTemplatePath, @"English\Metric Generic Model.rft");
-
-            //declare new family Name and Path
-            string nfamilyName = "NewTunnel";
-            string nfamilyFormat = ".rfa";
-            string nfamilyPath = Path.Combine(@"c:\temp", nfamilyName + nfamilyFormat);
+            // initialize the WFP interface UI
+            var userInputs = InitializeInterface(uidoc, doc, app);
+            string familyTemplateFullName = userInputs.Item1;
+            string nfamilyName = userInputs.Item2;
+            string nfamilyPath = userInputs.Item3;
 
             // check whether this is family file (.rfa) or a project file (.rvt)
             bool isAFamilyDoc = CheckFamily(doc);
@@ -92,6 +89,44 @@ namespace Tunnel_Excavation
             }
             // tell Revit it is succeeded
             return Result.Succeeded;
+        }
+
+        // initialize the WFP interface UI
+        private (string, string, string) InitializeInterface(UIDocument uidoc, Document doc, Application app)
+        {
+            try
+            {
+                UI popWindow = new UI(uidoc);
+
+                // get the path of family template folder
+                string famTemplatePath = app.FamilyTemplatePath;
+                string familyTemplateFolder = popWindow.familyTemplateName;
+                string familyTemplateFullName = Path.Combine(famTemplatePath, familyTemplateFolder);
+
+                //declare new family Name and Path
+                string nfamilyName = popWindow.familyName;
+                string nfamilyFormat = ".rfa";
+                string nfamilyPath = Path.Combine(@"c:\temp", nfamilyName + nfamilyFormat);
+
+                popWindow.ShowDialog();
+
+                return (familyTemplateFullName, nfamilyName,nfamilyPath);
+            }
+            catch (Exception e)
+            {
+                TaskDialog td = new TaskDialog("Fail")
+                {
+                    Title = "Error 003",
+                    AllowCancellation = true,
+                    MainInstruction = "Fail to initialize UI",
+                    MainContent = e.Message
+                };
+
+                td.CommonButtons = TaskDialogCommonButtons.Ok;
+                td.Show();
+
+                return (null, null, null);
+            }
         }
 
         // check whether this is a family file
